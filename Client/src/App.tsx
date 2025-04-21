@@ -12,12 +12,12 @@ function App() {
   return (
     <div
       id="dashboard-layout"
-      className="w-full h-screen flex flex-col md:flex-row overflow-hidden bg-[#1a1a1a] text-white"
+      className="w-screen h-screen flex flex-col md:flex-row overflow-hidden bg-[#1a1a1a] text-white"
     >
-      <aside className=" md:w-auto">
+      <aside className=" ">
         <Sidebar />
       </aside>
-      <div className="main-content flex flex-col  overflow-hidden">
+      <div className="main-content flex flex-col  overflow-hidden flex-1">
         <Header />
         <main className="content overflow-y-auto flex-grow px-2 sm:px-4">
           <div id="dashboard" className="max-w-full">
