@@ -13,8 +13,6 @@ const outdoorWeather = asyncHandler(
     if (!response.ok)
       return next(new ApiError(400, "failded to fetch Weather data"));
     const data = await response.json();
-    console.log(data);
-
     return res
       .status(200)
       .json(new ApiResponse(200, data, "Weather data sended Successfuly"));

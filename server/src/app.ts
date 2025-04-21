@@ -7,7 +7,8 @@ import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import logger from "./utils/logger";
 import { errorHandler } from "./middleware/ErrorHandler.middleware";
-import { outdoorClimate } from "./routes/climate.route";
+import {WeatherRoutes } from "./routes/climate.route";
+import { deviceRoutes } from "./routes/device.route";
 
 const app: Express = express();
 
@@ -45,7 +46,8 @@ app.use(
     credentials: true,
   })
 );
-app.use("/api/v1/weather", outdoorClimate);
+app.use("/api/v1/weather", WeatherRoutes);
+app.use("/api/v1/device",deviceRoutes)
 app.use(errorHandler);
 
 export default app;
