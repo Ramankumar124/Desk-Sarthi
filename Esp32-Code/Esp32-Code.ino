@@ -1,24 +1,27 @@
 #include <WiFi.h>
 #include <PubSubClient.h>
 #include <DHT.h>
-
+#include<secrets.h>
 #define DHTPIN 4
 #define DHTTYPE DHT11
-
+#define Relay1 16
+#define Relay2 17
+#define Relay3 5
+#define Relay4 18
 DHT dht(DHTPIN, DHTTYPE);
 WiFiClient wifiClient;
 PubSubClient mqttClient(wifiClient);
 
+const char *HeadIndex = "home/sensors/TempHumid";
+const char *TempHumidTopic = "home/command/Temp"; // Topic to subscribe to
+const char *RelayTopic = "home/command/Relay";
 
-
-const char* HeadIndex = "home/sensors/TempHumid";
-const char* TempHumidTopic = "home/command/Temp";  // Topic to subscribe to
-const char* RelayTopic = "home/command/Relay";
-
-String readTempHumid() {
+String readTempHumid()
+{
   float h = dht.readHumidity();
   float t = dht.readTemperature();
-  if (isnan(h) || isnan(t)) {
+  if (isnan(h) || isnan(t))
+  {
     Serial.println(F("Failed to read from DHT sensor!"));
     return "";
   }
@@ -27,48 +30,91 @@ String readTempHumid() {
 }
 
 // MQTT callback function for received messages
-void callback(char* topic, byte* payload, unsigned int length) {
+void callback(char *topic, byte *payload, unsigned int length)
+{
   Serial.print("Message arrived on topic: ");
   Serial.print(topic);
   Serial.print(". Message: ");
 
   // Convert payload to string
   String message;
-  for (int i = 0; i < length; i++) {
+  for (int i = 0; i < length; i++)
+  {
     message += (char)payload[i];
   }
   Serial.println(message);
 
-  if (String(topic) == TempHumidTopic) {
-    if (message == "get_TempHumid") {
+  if (String(topic) == TempHumidTopic)
+  {
+    if (message == "get_TempHumid")
+    {
       String tempHumid = readTempHumid();
-      if (tempHumid != "") {
+      if (tempHumid != "")
+      {
         mqttClient.publish(HeadIndex, tempHumid.c_str());
       }
     }
   }
 
-  else if (String(topic) == RelayTopic) {
-    if (message == "{\"id\":\"Relay1\",\"state\":\"ON\"}") {
+  else if (String(topic) == RelayTopic)
+  {
+    if (message == "{\"id\":\"Relay1\",\"state\":\"ON\"}")
+    {
+      digitalWrite(Relay1, LOW);
       Serial.println("Turn on relay 1");
-    } else if (message == "{\"id\":\"Relay1\",\"state\":\"OFF\"}") {
-      Serial.println("Turn off relay 1"); // Fixed: was saying relay 2
-    } else if (message == "{\"id\":\"Relay2\",\"state\":\"ON\"}") {
+    }
+    else if (message == "{\"id\":\"Relay1\",\"state\":\"OFF\"}")
+    {
+      digitalWrite(Relay1, HIGH);
+      Serial.println("Turn off relay 1");
+    }
+    else if (message == "{\"id\":\"Relay2\",\"state\":\"ON\"}")
+    {
+      digitalWrite(Relay2, LOW);
       Serial.println("Turn on relay 2");
+    }
+    else if (message == "{\"id\":\"Relay2\",\"state\":\"OFF\"}")
+    {
+      digitalWrite(Relay2, HIGH);
+      Serial.println("Turn off relay 2");
+    }
+    else if (message == "{\"id\":\"Relay3\",\"state\":\"ON\"}")
+    {
+      digitalWrite(Relay3, LOW);
+      Serial.println("Turn on relay 3");
+    }
+    else if (message == "{\"id\":\"Relay3\",\"state\":\"OFF\"}")
+    {
+      digitalWrite(Relay3, HIGH);
+      Serial.println("Turn off relay 3");
+    }
+    else if (message == "{\"id\":\"Relay4\",\"state\":\"ON\"}")
+    {
+      digitalWrite(Relay4, LOW);
+      Serial.println("Turn on relay 4");
+    }
+    else if (message == "{\"id\":\"Relay4\",\"state\":\"OFF\"}")
+    {
+      digitalWrite(Relay4, HIGH);
+      Serial.println("Turn off relay 4");
     }
   }
 }
 
-void reconnect() {
-  while (!mqttClient.connected()) {
+void reconnect()
+{
+  while (!mqttClient.connected())
+  {
     Serial.println("Connecting to MQTT...");
-    if (mqttClient.connect("ESP32Client")) {
+    if (mqttClient.connect("ESP32Client"))
+    {
       Serial.println("Connected to MQTT");
       // Subscribe to topic after connection
       mqttClient.subscribe(TempHumidTopic);
       mqttClient.subscribe(RelayTopic);
-
-    } else {
+    }
+    else
+    {
       Serial.print("Failed, rc=");
       Serial.print(mqttClient.state());
       Serial.println(" try again in 5 seconds");
@@ -77,34 +123,49 @@ void reconnect() {
   }
 }
 
-void setup() {
+void setup()
+{
   Serial.begin(115200);
   dht.begin();
 
+  // Initialize relay pins as outputs
+  pinMode(Relay1, OUTPUT);
+  pinMode(Relay2, OUTPUT);
+  pinMode(Relay3, OUTPUT);
+  pinMode(Relay4, OUTPUT);
+digitalWrite(Relay1,HIGH);
+digitalWrite(Relay2,HIGH);
+digitalWrite(Relay3,HIGH);
+digitalWrite(Relay4,HIGH);
   WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) {
+  while (WiFi.status() != WL_CONNECTED)
+  {
     delay(1000);
     Serial.println("Connecting to WiFi...");
   }
   Serial.println("Connected to WiFi");
 
   mqttClient.setServer(mqttBroker, mqttPort);
-  mqttClient.setCallback(callback);  // Set the callback function
+  mqttClient.setCallback(callback); // Set the callback function
 
-  reconnect();  // Connect and subscribe
+  reconnect(); // Connect and subscribe
 }
 
-void loop() {
-  if (!mqttClient.connected()) {
+void loop()
+{
+  if (!mqttClient.connected())
+  {
     reconnect();
   }
-  mqttClient.loop();  // Maintain MQTT connection and process incoming messages
+  mqttClient.loop(); // Maintain MQTT connection and process incoming messages
 
   static unsigned long lastPublish = 0;
-  if (millis() - lastPublish >= 5000) {  // Publish every 5 seconds
+  if (millis() - lastPublish >= 5000)
+  { // Publish every 5 seconds
     lastPublish = millis();
     String tempHumid = readTempHumid();
-    if (tempHumid != "") {
+    if (tempHumid != "")
+    {
       Serial.println(tempHumid);
       mqttClient.publish(HeadIndex, tempHumid.c_str());
     }
