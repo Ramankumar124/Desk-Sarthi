@@ -15,6 +15,27 @@
       "when": 1745342875269,
       "tag": "0001_parallel_fabian_cortez",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1745412203198,
+      "tag": "0002_volatile_nitro",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1745412366723,
+      "tag": "0003_famous_quicksilver",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1745412465314,
+      "tag": "0004_perfect_echo",
+      "breakpoints": true
     }
   ]
 }

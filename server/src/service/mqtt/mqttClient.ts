@@ -1,6 +1,8 @@
 import mqtt, { MqttClient } from "mqtt";
-import { heatIndex } from "../../database/schema";
+import { heatIndex, relaySwitches } from "../../database/schema";
 import { db } from "../../database";
+import { RELAY_STATE_ROW_ID } from "../../utils/diviceRelay";
+import { eq } from "drizzle-orm";
 
 let mqttClient: MqttClient = mqtt.connect("mqtt://192.168.31.94");
 
@@ -9,6 +11,7 @@ mqttClient.on("connect", () => {
   mqttClient.subscribe("home/sensors/TempHumid");
   mqttClient.subscribe("device/status/relay");
   mqttClient.subscribe("device/status/rgb");
+  mqttClient.subscribe("Esp32Connected");
 });
 
 mqttClient.on("error", (err) => {
@@ -20,7 +23,24 @@ export const initMQTT = (io: any) => {
     const data = message.toString();
     console.log(`📥 MQTT: ${topic} - ${data}`);
 
-    if (topic === "home/sensors/TempHumid") {
+    if (topic == "Esp32Connected") {
+      console.log("ESp32 Connected TO server");
+
+      const states = await db
+        ?.select()
+        .from(relaySwitches)
+        .where(eq(relaySwitches.id, RELAY_STATE_ROW_ID));
+      const state = states?.[0];
+
+      if (state) {
+        const { id, ...relayOnly } = state;
+        mqttClient.publish(
+          "home/sensors/relayState",
+          JSON.stringify(relayOnly)
+        );
+      }
+      mqttClient.publish("home/sensors/relayState", JSON.stringify(state));
+    } else if (topic === "home/sensors/TempHumid") {
       const parsedData = JSON.parse(data);
       console.log(parsedData, typeof parsedData);
       await db?.insert(heatIndex).values({
