@@ -5,15 +5,7 @@ import { Server } from "socket.io";
 import { initMQTT } from "./service/mqtt/mqttClient";
 import { handleSocket } from "./service/socket/socketHandler";
 
-DBConnection()
-  .then(() => {
-    console.log("Database connection successfull");
-    
-  })
-  .catch((err: string) => {
-    console.log("database connection failed");
-  });
-
+DBConnection();
   const server = http.createServer(app);
   const ALLOWED_ORIGINS:any = [process.env.CLIENT_URL, "http://localhost:5173"];
 

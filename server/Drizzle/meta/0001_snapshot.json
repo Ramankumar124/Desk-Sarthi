@@ -1,6 +1,6 @@
 {
-  "id": "8a2924b2-0fc4-4417-823b-844b73649026",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "607ed6e0-096d-4c5e-9a9e-0eaaa96f1090",
+  "prevId": "8a2924b2-0fc4-4417-823b-844b73649026",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -26,12 +26,6 @@
           "type": "real",
           "primaryKey": false,
           "notNull": false
-        },
-        "device_id": {
-          "name": "device_id",
-          "type": "serial",
-          "primaryKey": false,
-          "notNull": true
         }
       },
       "indexes": {},

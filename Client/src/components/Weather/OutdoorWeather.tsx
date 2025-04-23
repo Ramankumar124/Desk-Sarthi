@@ -22,12 +22,12 @@ const WeatherOutDoorInfo = () => {
   }, []);
 
   return (
-    <div className="bg-neutral-800 rounded-xl p-6 border border-neutral-700/20 hover:border-neutral-600/40 transition-all ">
+    <div className="bg-neutral-800  rounded-xl p-6 transition-all ">
       <div className="flex justify-between items-start mb-4">
         <div>
-          <h3 className="text-secondary text-sm mb-1">Weather Info</h3>
+          <h3 className="text-background text-sm mb-1">Weather Info</h3>
           <div className="flex items-center space-x-2">
-            <GrLocation className="text-primary text-3xl font-bold " />
+            <GrLocation className=" text-3xl font-bold " />
             <span className="text-white">{weather?.name}, Bangladesh</span>
           </div>
         </div>

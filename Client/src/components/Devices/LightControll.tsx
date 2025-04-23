@@ -21,7 +21,7 @@ const LightControll = () => {
 
   return (
     <div className="w-full  flex flex-col">
-      <div className="bg-[#2A2A2A] rounded-xl p-6 border border-neutral-700/20 hover:border-neutral-600/40 transition-all">
+      <div className="bg-[#2A2A2A] rounded-xl p-6  transition-all">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-gray-400 text-sm">RGB Color Control</h3>
           <button className="bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 px-3 py-1 rounded-full transition-colors">

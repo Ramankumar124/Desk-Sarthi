@@ -14,7 +14,7 @@ const DeviceControll = () => {
     await Api.post("/device/relayToggle", { switchId: id, state: state });
   };
   return (
-    <div className="bg-neutral-800 text-primary p-4 rounded-xl flex flex-col items-center justify-center">
+    <div className="bg-neutral-800 text-white p-4 rounded-xl flex flex-col items-center justify-center">
       <h1 className="text-lg font-bold mb-2  ">Quick Actions</h1>
       <div className="grid grid-rows-2 grid-cols-2  gap-4">
         <div id="button1" className="w-fit bg-blue-500/10 p-3 rounded-xl">

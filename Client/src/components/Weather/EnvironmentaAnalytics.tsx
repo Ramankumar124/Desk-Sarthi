@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 import {
@@ -23,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import Api from "@/api";
 const chartData = [
   { date: "2024-04-01", desktop: 222, mobile: 150 },
   { date: "2024-04-02", desktop: 97, mobile: 180 },
@@ -121,39 +121,63 @@ const chartConfig = {
     label: "Visitors",
   },
   desktop: {
-    label: "Desktop",
-    color: "hsl(var(--chart-1))",
+    label: "temperature",
+    color: "hsl(12 76% 61))",
   },
   mobile: {
-    label: "Mobile",
+    label: "humidity",
     color: "hsl(var(--chart-2))",
   },
 } satisfies ChartConfig;
 
 const EnvironmentaAnalytics = () => {
-  const [timeRange, setTimeRange] = React.useState("90d");
 
+
+  const [timeRange, setTimeRange] = React.useState("1 hour");
+  const [chartData, setChartData] = useState();
   const [loading, setloading] = useState(false);
-  useEffect(() => {
-    setloading(true);
-  }, []);
-  // if(!loading) return <div>Loading...</div>
-  const filteredData = chartData.filter((item) => {
-    const date = new Date(item.date);
-    const referenceDate = new Date("2024-06-30");
-    let daysToSubtract = 90;
-    if (timeRange === "30d") {
-      daysToSubtract = 30;
-    } else if (timeRange === "7d") {
-      daysToSubtract = 7;
+
+  const dateFormatter=(value:string)=>{
+    
+    const parts = value.split(', ');
+    const timeParts = parts[1].split(':');
+
+    if(timeRange=="7 days"){
+      const day=parts[0].split('/');
+       return `${day[0]}/${day[1]}`
     }
-    const startDate = new Date(referenceDate);
-    startDate.setDate(startDate.getDate() - daysToSubtract);
-    return date >= startDate;
-  });
+    const minutes = timeParts[1]; // Extract just the minutes
+    const hours=timeParts[0];
+
+    // Format as hour:minute
+    return `${hours}:${minutes}`;
+  }
+  useEffect(() => {
+    const getAnalytics = async () => {
+      try {
+        setloading(true);
+        const response = await Api.post("/weather/indoorAnalytics", {
+          duration: timeRange,
+        });
+        
+        if (response?.data?.data) {
+          // Format data if needed, each item should have timestamp, temperature, humidity
+          setChartData(response.data.data);
+          console.log(response?.data?.data);
+          
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setloading(false);
+      }
+    };
+    
+    getAnalytics();
+  }, [timeRange]); // Refetch when timeRange changes
   return (
-    <Card className="m-5 bg-dark text-white">
-      <CardHeader className="flex  items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
+<div><Card>
+      <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
         <div className="grid flex-1 gap-1 text-center sm:text-left">
           <CardTitle>Area Chart - Interactive</CardTitle>
           <CardDescription>
@@ -168,102 +192,87 @@ const EnvironmentaAnalytics = () => {
             <SelectValue placeholder="Last 3 months" />
           </SelectTrigger>
           <SelectContent className="rounded-xl">
-            <SelectItem value="90d" className="rounded-lg">
-              Last 3 months
+            <SelectItem value="1 hour" className="rounded-lg">
+              Last 1 hour
             </SelectItem>
-            <SelectItem value="30d" className="rounded-lg">
-              Last 30 days
+            <SelectItem value="24 hours" className="rounded-lg">
+              Today
             </SelectItem>
-            <SelectItem value="7d" className="rounded-lg">
+            <SelectItem value="7 days" className="rounded-lg">
               Last 7 days
             </SelectItem>
           </SelectContent>
         </Select>
       </CardHeader>
-      <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6 b">
+      <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
         <ChartContainer
           config={chartConfig}
           className="aspect-auto h-[250px] w-full"
         >
-          {!loading ? (
-            <div className="h-fit w-full">Loading...</div>
-          ) : (
-            <AreaChart data={filteredData}>
-              <defs>
-                <linearGradient id="fillDesktop" x1="0" y1="0" x2="0" y2="1">
-                  <stop
-                    offset="5%"
-                    stopColor="red"
-                    stopOpacity={0.8}
-                  />
-                  <stop
-                    offset="95%"
-                    stopColor=""
-                    stopOpacity={0.1}
-                  />
-                </linearGradient>
-                <linearGradient id="fillMobile" x1="0" y1="0" x2="0" y2="1">
-                  <stop
-                    offset="5%"
-                    stopColor="blue"
-                    stopOpacity={0.8}
-                  />
-                  <stop
-                    offset="95%"
-                    stopColor=""
-                    stopOpacity={0.1}
-                  />
-                </linearGradient>
-              </defs>
-              {/* <CartesianGrid vertical={false} /> */}
-              <XAxis
-                dataKey="date"
-                tickLine={false}
-                axisLine={false}
-                tickMargin={8}
-                minTickGap={32}
-                tickFormatter={(value) => {
-                  const date = new Date(value);
-                  return date.toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                  });
-                }}
-              />
-              <ChartTooltip
-                cursor={false}
-                content={
-                  <ChartTooltipContent
-                    labelFormatter={(value) => {
-                      return new Date(value).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                      });
-                    }}
-                    indicator="dot"
-                  />
-                }
-              />
-              <Area
-                dataKey="mobile"
-                type="natural"
-                fill="url(#fillMobile)"
-                stroke="var(--color-mobile)"
-                stackId="a"
-              />
-              <Area
-                dataKey="desktop"
-                type="natural"
-                fill="url(#fillDesktop)"
-                stroke="var(--color-desktop)"
-                stackId="a"
-              />
-              {/* <ChartLegend content={<ChartLegendContent />} /> */}
-            </AreaChart>
-          )}{" "}
+          <AreaChart data={chartData}>
+            <defs>
+              <linearGradient id="fillDesktop" x1="0" y1="0" x2="0" y2="1">
+                <stop
+                  offset="5%"
+                  stopColor="var(--color-desktop)"
+                  stopOpacity={0.8}
+                />
+                <stop
+                  offset="95%"
+                  stopColor="var(--color-desktop)"
+                  stopOpacity={0.1}
+                />
+              </linearGradient>
+              <linearGradient id="fillMobile" x1="0" y1="0" x2="0" y2="1">
+                <stop
+                  offset="5%"
+                  stopColor="var(--color-mobile)"
+                  stopOpacity={0.8}
+                />
+                <stop
+                  offset="95%"
+                  stopColor="var(--color-mobile)"
+                  stopOpacity={0.1}
+                />
+              </linearGradient>
+            </defs>
+            <CartesianGrid vertical={false} />
+            <XAxis
+              dataKey="timestamp"
+              tickLine={false}
+              axisLine={false}
+              tickMargin={8}
+              minTickGap={32}
+              tickFormatter={(value) => dateFormatter(value)}
+            />
+            <ChartTooltip
+              cursor={false}
+              content={
+                <ChartTooltipContent
+                  labelFormatter={(value) => dateFormatter(value)}
+                  indicator="dot"
+                />
+              }
+            />
+            <Area
+              dataKey="temperature"
+              type="natural"
+              fill="url(#fillMobile)"
+              stroke="var(--color-mobile)"
+              stackId="a"
+            />
+            <Area
+              dataKey="humidity"
+              type="natural"
+              fill="url(#fillDesktop)"
+              stroke="var(--color-desktop)"
+              stackId="a"
+            />
+            <ChartLegend content={<ChartLegendContent />} />
+          </AreaChart>
         </ChartContainer>
       </CardContent>
-    </Card>
+    </Card></div>
   );
 };
 

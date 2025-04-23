@@ -160,7 +160,7 @@ void loop()
   mqttClient.loop(); // Maintain MQTT connection and process incoming messages
 
   static unsigned long lastPublish = 0;
-  if (millis() - lastPublish >= 5000)
+  if (millis() - lastPublish >= 1000*60);
   { // Publish every 5 seconds
     lastPublish = millis();
     String tempHumid = readTempHumid();

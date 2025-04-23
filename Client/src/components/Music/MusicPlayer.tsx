@@ -23,7 +23,7 @@ const MusicPlayer = () => {
   return (
     <div className=" bg-secondary grid grid-cols-1 md:grid-cols-2 md:flex text-primary w-full gap-8 p-2  ">
       <div id="music-left " className="w-full md:w-1/2 bg-primary">
-        <div className="bg-neutral-800 rounded-xl p-6 border border-neutral-700/30 hover:border-neutral-600/50 transition-all">
+        <div className="bg-neutral-800 rounded-xl p-6  transition-all">
           <h3 className="text-white mb-6 text-lg font-semibold">
             Music Player
           </h3>
@@ -96,7 +96,7 @@ const MusicPlayer = () => {
         </div>
       </div>
       <div id="music-right" className="w-full md:w-1/2 bg-primary">
-        <div className="bg-neutral-800 rounded-xl h-full p-6 border border-neutral-700/30 hover:border-neutral-600/50 transition-all">
+        <div className="bg-neutral-800 rounded-xl h-full p-6  transition-all">
           <h3 className="text-white mb-6 text-lg font-semibold">Queue</h3>
           <div className="space-y-4">
             <div className="flex items-center p-3 bg-neutral-700/30 rounded-lg hover:bg-neutral-700/50 transition-colors cursor-pointer">

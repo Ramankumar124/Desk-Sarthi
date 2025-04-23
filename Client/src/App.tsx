@@ -12,7 +12,7 @@ function App() {
   return (
     <div
       id="dashboard-layout"
-      className="w-screen h-screen flex flex-col md:flex-row overflow-hidden bg-[#1a1a1a] text-white"
+      className="w-screen h-screen flex flex-col md:flex-row overflow-hidden bg-[#1a1a1a] text-background"
     >
       <aside className=" ">
         <Sidebar />
@@ -22,7 +22,7 @@ function App() {
         <main className="content overflow-y-auto flex-grow px-2 sm:px-4">
           <div id="dashboard" className="max-w-full">
             <section id="Overview" className="w-full py-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mx-2 sm:mx-4 md:mx-6">
+              <div className="grid grid-cols-1 md:grid-cols-2  lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mx-2 sm:mx-4 md:mx-6">
                 <WeatherOutDoorInfo />
                 <WeatherIndoor />
                 <DeviceControll />

@@ -1,0 +1,1 @@
+ALTER TABLE "sensor_data" DROP COLUMN "device_id";
