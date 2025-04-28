@@ -7,8 +7,27 @@ import DeviceControll from "./components/Devices/DeviceControll";
 import MusicPlayer from "./components/Music/MusicPlayer";
 import LightControll from "./components/Devices/LightControll";
 import EnvironmentaAnalytics from "./components/Weather/EnvironmentaAnalytics";
+import { useEffect, useState } from "react";
+import Api from "./api";
+import WebPlayback from "./components/Music/webPlayer";
 
 function App() {
+
+  
+  const [token, setToken] = useState();
+
+  useEffect(() => {
+
+    async function getToken() {
+      const response = await Api.get('/spotify/accessToken');
+      console.log("token A GYA HAI ",);
+
+      setToken(response.data.data.token);
+    }
+
+    getToken();
+
+  }, []);
   return (
     <div
       id="dashboard-layout"
@@ -30,7 +49,8 @@ function App() {
             </section>
             <section id="music-player" className="w-full py-3 px-2 sm:px-4">
               <div className="w-full overflow-x-auto">
-                <MusicPlayer />
+                <MusicPlayer token={token!} />
+    {/* {token && <WebPlayback token={token}/>} */}
               </div>
             </section>
             <section id="light-controll" className="w-full py-3 px-2 sm:px-4">
