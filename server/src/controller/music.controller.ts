@@ -62,7 +62,7 @@ const callbackSpotify = asyncHandler(async (req: Request, res: Response) => {
     httpOnly: true,
     secure: true, // true in production
     sameSite: "lax",
-    maxAge: 7 * 24 * 60 * 60 * 1000,
+    maxAge: 60 * 60 * 1000,
   });
 
   res.cookie("spotifyRefreshToken", refreshToken, {
@@ -75,68 +75,68 @@ const callbackSpotify = asyncHandler(async (req: Request, res: Response) => {
   res.redirect("http://localhost:5173/");
 });
 
-// MIDDLEWARE: Check user is logged in
-
 // PLAY TRACK
 const playTrack = asyncHandler(async (req: Request, res: Response) => {
   const { uri, playlistId } = req.body;
-  
+
   try {
     if (playlistId) {
       // Play track in the context of a playlist
       await spotifyApi.play({
         context_uri: `spotify:playlist:${playlistId}`,
-        offset: { uri: uri }
+        offset: { uri: uri },
       });
     } else {
       // Play single track without playlist context
       await spotifyApi.play({
-        uris: [uri]
+        uris: [uri],
       });
     }
-    
-    return res.status(200).json(new ApiResponse(200, {}, "Track playing successfully"));
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, {}, "Track playing successfully"));
   } catch (error) {
     console.error("Failed to play track:", error);
-    return res.status(500).json(new ApiResponse(500, {}, "Failed to play track"));
+    return res
+      .status(500)
+      .json(new ApiResponse(500, {}, "Failed to play track"));
   }
 });
-const playSavedSongs=asyncHandler(
+const playSavedSongs = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-  const {trackId}=req.body;
+    const { trackId } = req.body;
     const savedTracks = await spotifyApi.getMySavedTracks({ limit: 50 });
-    const uris = savedTracks.body.items.map(item => item.track.uri);
-    const startIndex = uris.findIndex(uri => uri.includes(trackId));
-  
+    const uris = savedTracks.body.items.map((item) => item.track.uri);
+    const startIndex = uris.findIndex((uri) => uri.includes(trackId));
+
     if (startIndex === -1) {
-      console.log('Track not found in liked songs');
+      console.log("Track not found in liked songs");
       return;
     }
-  
+
     await spotifyApi.play({
       uris: uris,
-      offset: { position: startIndex }
+      offset: { position: startIndex },
     });
   }
-)
+);
 const searchTrack = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const { name } = req.body;
     const response = await spotifyApi.searchTracks(name, { limit: 10 });
-    
-    const tracks = response.body.tracks?.items.map(track => ({
+
+    const tracks = response.body.tracks?.items.map((track) => ({
       id: track.id,
       name: track.name,
       uri: track.uri,
       artist: track.artists[0]?.name,
-      image: track.album.images[0]?.url || null
+      image: track.album.images[0]?.url || null,
     }));
-    
+
     return res
       .status(200)
-      .json(
-        new ApiResponse(200, { tracks }, "Tracks found successfully")
-      );
+      .json(new ApiResponse(200, { tracks }, "Tracks found successfully"));
   }
 );
 
@@ -160,12 +160,7 @@ const resumePlayback = asyncHandler(
 );
 const skipToNext = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      await spotifyApi.skipToNext();
-      console.log("skipped to next");
-    } catch (error) {
-      console.log("unable toskip", error);
-    }
+    const response = await spotifyApi.skipToNext();
 
     return res
       .status(200)
@@ -329,17 +324,17 @@ const playlistTracks = asyncHandler(
       .json(new ApiResponse(200, tracks, "Playlist data sended successufully"));
   }
 );
-const getSavedSongs=asyncHandler(
+const getSavedSongs = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const limit = 50; // Max number of items per request
     const offset = 0;
 
     const response = await spotifyApi.getMySavedTracks({
       limit,
-      offset
+      offset,
     });
 
-     const tracks = response.body.items.map((item) => {
+    const tracks = response.body.items.map((item) => {
       const track = item.track;
       const formatDuration = (ms: number) => {
         const minutes = Math.floor(ms / 60000);
@@ -362,9 +357,61 @@ const getSavedSongs=asyncHandler(
 
     return res
       .status(200)
-      .json(new ApiResponse(200, tracks, "Saved tracks retrieved successfully"));
+      .json(
+        new ApiResponse(200, tracks, "Saved tracks retrieved successfully")
+      );
   }
-)
+);
+const refreshAccessToken = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      // Get the refresh token from cookies
+      const refreshToken = req.cookies.spotifyRefreshToken;
+
+      if (!refreshToken) {
+        return res
+          .status(401)
+          .json(new ApiResponse(401, {}, "No refresh token available"));
+      }
+
+      // Set the refresh token in the API instance
+      spotifyApi.setRefreshToken(refreshToken);
+
+      // Request a new access token
+      const data = await spotifyApi.refreshAccessToken();
+      const newAccessToken = data.body["access_token"];
+
+      // Update the API instance with the new token
+      spotifyApi.setAccessToken(newAccessToken);
+
+      // Save the new access token in a cookie
+      res.cookie("spotifyAccessToken", newAccessToken, {
+        httpOnly: true,
+        secure: true, // true in production
+        sameSite: "lax",
+        maxAge: 3600 * 1000, // 1 hour
+      });
+
+      console.log("Access token refreshed successfully");
+
+      return res
+        .status(200)
+        .json(
+          new ApiResponse(
+            200,
+            newAccessToken,
+            "Access token refreshed successfully"
+          )
+        );
+    } catch (error) {
+      console.error("Failed to refresh access token:", error);
+      return res
+        .status(500)
+        .json(new ApiResponse(500, {}, "Failed to refresh access token"));
+    }
+  }
+);
+
 export {
   loginSpotify,
   callbackSpotify,
@@ -384,4 +431,5 @@ export {
   playlistTracks,
   getSavedSongs,
   playSavedSongs,
+  refreshAccessToken,
 };

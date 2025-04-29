@@ -11,6 +11,7 @@ import {
   playlistTracks,
   playSavedSongs,
   playTrack,
+  refreshAccessToken,
   resumePlayback,
   searchTrack,
   seekPlayBack,
@@ -42,5 +43,6 @@ router.route("/getUserPlaylists").get(isAuthenticated,userPlaylist);
 router.route("/getPlayListTracks").post(isAuthenticated,playlistTracks);
 router.route("/getSavedSongs").get(isAuthenticated,getSavedSongs);
 router.route("/playSaveSongs").post(isAuthenticated,playSavedSongs);
+router.route("/refreshAccessToken").get(refreshAccessToken);
 
 export { router as spotifyRoutes };

@@ -11,20 +11,31 @@ import { useEffect, useState } from "react";
 import Api from "./api";
 
 function App() {
-
+  const [token, setToken] = useState(null);
+  const [isLoggedIn, setisLoggedIn] = useState(false);
   
-  const [token, setToken] = useState();
-
   useEffect(() => {
+    const fetchSpotifyToken = async () => {
+      try {
+        const accessTokenResponse = await Api.get("/spotify/accessToken");
+        setToken(accessTokenResponse.data.data.token);
+        setisLoggedIn(true);
+      } catch (error) {
+        try {
+          await Api.get("/spotify/refreshAccessToken");
+          const newAccessTokenResponse = await Api.get("/spotify/accessToken");
+          setToken(newAccessTokenResponse.data.data.token);
+          setisLoggedIn(true);
+        } catch (refreshError) {
+          // If both attempts fail, set logged out state
+          setToken(null);
+          setisLoggedIn(false);
+          console.error("Spotify authentication failed:", refreshError);
+        }
+      }
+    };
 
-    async function getToken() {
-      const response = await Api.get('/spotify/accessToken');
-      console.log("token A GYA HAI ",);
-
-      setToken(response.data.data.token);
-    }
-    getToken();
-
+    fetchSpotifyToken();
   }, []);
   return (
     <div
@@ -47,8 +58,7 @@ function App() {
             </section>
             <section id="music-player" className="w-full py-3 px-2 sm:px-4">
               <div className="w-full max-h[400px] ">
-                <MusicPlayerLayout token={token!} />
-  
+                <MusicPlayerLayout token={token!}  setToken={setToken} isLoggedIn={isLoggedIn}/>
               </div>
             </section>
             <section id="light-controll" className="w-full py-3 px-2 sm:px-4">

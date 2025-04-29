@@ -89,13 +89,17 @@ const getPlaylistTracks = async (
   console.log("playlist songs", response.data.data);
   setTracks(response?.data?.data);
 };
-const playTrack = async (id: string, playListid: string | null) => {
-  if (playListid = "Searched Track") {
+const playTrack = async (id: string, playlistId: string | null) => {
+  
+  if (playlistId === "Searched Track") {
     await Api.post("/spotify/play", { uri:id });
-  } else if (playListid) {
-    await Api.post("/spotify/play", { uri:id, playListid });
+  
+  } else if (playlistId) {
+    await Api.post("/spotify/play", { uri:id, playlistId });
+
   } else {
     await Api.post("/spotify/playSaveSongs", { trackId: id });
+    
   }
 };
 export {

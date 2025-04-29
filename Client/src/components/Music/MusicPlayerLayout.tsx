@@ -30,17 +30,15 @@ namespace Spotify {
 }
 
 import {
-
   filterUniqueDevices,
 } from "@/lib/spotify/utils";
 
 
 import MusicRight from "./MusicRight";
 import MusicLeft from "./MusicLeft";
+import { MusicPlayerProps, Track } from "@/properties/interfaces/spotify";
 
-interface MusicPlayerProps {
-  token: string;
-}
+
 const track = {
   name: "",
   album: {
@@ -48,18 +46,9 @@ const track = {
   },
   artists: [{ name: "" }],
 };
-interface Track {
-  id: string;
-  name: string;
-  artists: string;
-  image: {
-    url: string;
-  };
-  duration: string;
-  uri: string;
-}
 
-const MusicPlayerLayout = ({ token }: MusicPlayerProps) => {
+
+const MusicPlayerLayout = ({ token ,setToken,isLoggedIn}: MusicPlayerProps) => {
   const [is_paused, setPaused] = useState(true);
   const [player, setPlayer] = useState<Spotify.Player | null>(null);
   const [current_track, setCurrentTrack] = useState(track);
@@ -161,6 +150,15 @@ const MusicPlayerLayout = ({ token }: MusicPlayerProps) => {
             Authorization: `Bearer ${token}`,
           },
         });
+       if(!res.ok) {
+        if(res.status==401){
+          console.log("error hai");
+         const response= await Api.get("/spotify/refreshAccessToken");
+         setToken(response?.data?.data.newAccessToken);
+        }
+        }
+       
+        
         if (res.ok) {
           const data = await res.json();
           if (data) {
@@ -229,6 +227,7 @@ const MusicPlayerLayout = ({ token }: MusicPlayerProps) => {
       setPaused={setPaused}
       trackDuration={trackDuration}
       activeDevices={activeDevices}
+      isLoggedIn={isLoggedIn}
        />
 
       <MusicRight
