@@ -4,12 +4,11 @@ import Header from "./components/Header/Header";
 import WeatherOutDoorInfo from "./components/Weather/OutdoorWeather";
 import WeatherIndoor from "./components/Weather/IndoorWeather";
 import DeviceControll from "./components/Devices/DeviceControll";
-import MusicPlayer from "./components/Music/MusicPlayer";
+import MusicPlayerLayout from "./components/Music/MusicPlayerLayout";
 import LightControll from "./components/Devices/LightControll";
 import EnvironmentaAnalytics from "./components/Weather/EnvironmentaAnalytics";
 import { useEffect, useState } from "react";
 import Api from "./api";
-import WebPlayback from "./components/Music/webPlayer";
 
 function App() {
 
@@ -24,7 +23,6 @@ function App() {
 
       setToken(response.data.data.token);
     }
-
     getToken();
 
   }, []);
@@ -48,9 +46,9 @@ function App() {
               </div>
             </section>
             <section id="music-player" className="w-full py-3 px-2 sm:px-4">
-              <div className="w-full overflow-x-auto">
-                <MusicPlayer token={token!} />
-    {/* {token && <WebPlayback token={token}/>} */}
+              <div className="w-full max-h[400px] ">
+                <MusicPlayerLayout token={token!} />
+  
               </div>
             </section>
             <section id="light-controll" className="w-full py-3 px-2 sm:px-4">
