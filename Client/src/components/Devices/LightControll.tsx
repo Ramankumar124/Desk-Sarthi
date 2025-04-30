@@ -10,14 +10,14 @@ interface RGBA {
 const LightControll = () => {
   const [rgba, setRgba] = useState<RGBA>({ r: 255, g: 128, b: 6, a: 1 });
 
-  const handleWheelChange = (color: { hsva: any }) => {
+  const handleWheelChange = (color: { hsva: { h: number; s: number; v: number; a: number } }) => {
     const newRgba = hsvaToRgba(color.hsva);
     setRgba(newRgba);
     console.log(color);
   };
-  const handleSliderChange = (key: keyof RGBA, value: number) => {
-    setRgba((prev) => ({ ...prev, [key]: value }));
-  };
+  // const handleSliderChange = (key: keyof RGBA, value: number) => {
+  //   setRgba((prev) => ({ ...prev, [key]: value }));
+  // };
 
   return (
     <div className="w-full  flex flex-col">

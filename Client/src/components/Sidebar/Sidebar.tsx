@@ -1,45 +1,77 @@
+import { useState } from "react";
+import { SidebarContent, SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "../ui/sidebar";
+import { BarChart3, LayoutDashboard, Lightbulb, Music } from "lucide-react";
 
-
-import React from "react";
-
-const Sidebar = () => {
-  const scrollToSection = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+export const SidebarNavigation = () => {
+    const [activeSection, setActiveSection] = useState("overview");
+    const sidebar = useSidebar();
+  
+    // Enhanced function to scroll to section and close sidebar
+    const scrollToSection = (id: string) => {
+      setActiveSection(id);
+  
+      // Close mobile sidebar when clicked
+      if (sidebar.isMobile) {
+        sidebar.setOpenMobile(false);
+      }
+  
+      const element = document.getElementById(id);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+      }
+    };
+  
+    return (
+      <SidebarContent >
+        <SidebarGroup>
+          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                onClick={() => scrollToSection("overview")}
+                isActive={activeSection === "overview"}
+                tooltip="Overview"
+              >
+                <LayoutDashboard className="mr-2" />
+                <span>Overview</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+  
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                onClick={() => scrollToSection("music-player")}
+                isActive={activeSection === "music-player"}
+                tooltip="Music Player"
+              >
+                <Music className="mr-2" />
+                <span>Music Player</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+  
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                onClick={() => scrollToSection("light-control")}
+                isActive={activeSection === "light-control"}
+                tooltip="Light Control"
+              >
+                <Lightbulb className="mr-2" />
+                <span>Light Control</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+  
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                onClick={() => scrollToSection("analytics")}
+                isActive={activeSection === "analytics"}
+                tooltip="Analytics"
+              >
+                <BarChart3 className="mr-2" />
+                <span>Analytics</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroup>
+      </SidebarContent>
+    );
   };
-
-  return (
-    <aside className="w-full h-full bg-primary text-primary hidden lg:flex flex-col p-5">
-      <h1 className="text-4xl font-bold">Desk Sarthi</h1>
-      <nav className="text-secondary pl-3 mt-12">
-        <ul className="flex flex-col gap-4 text-3xl">
-          <li
-            onClick={() => scrollToSection("overview")}
-            className="cursor-pointer"
-          >
-            Overview
-          </li>
-          <li
-            onClick={() => scrollToSection("music-player")}
-            className="cursor-pointer"
-          >
-            Music Player
-          </li>
-          <li
-            onClick={() => scrollToSection("light-control")}
-            className="cursor-pointer"
-          >
-            Light Control
-          </li>
-          <li
-            onClick={() => scrollToSection("analytics")}
-            className="cursor-pointer"
-          >
-            Analytics
-          </li>
-        </ul>
-      </nav>
-    </aside>
-  );
-};
-
-export default Sidebar;
+  

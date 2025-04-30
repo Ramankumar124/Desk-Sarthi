@@ -45,7 +45,7 @@ const pausePlayback = async (
   try {
     await Api.get("/spotify/pause");
   } catch (error: any) {
-    console.log(error);
+    console.log("Playback error", error?.message);
   }
 };
 const resumePlayback = async (
@@ -90,16 +90,12 @@ const getPlaylistTracks = async (
   setTracks(response?.data?.data);
 };
 const playTrack = async (id: string, playlistId: string | null) => {
-  
   if (playlistId === "Searched Track") {
-    await Api.post("/spotify/play", { uri:id });
-  
+    await Api.post("/spotify/play", { uri: id });
   } else if (playlistId) {
-    await Api.post("/spotify/play", { uri:id, playlistId });
-
+    await Api.post("/spotify/play", { uri: id, playlistId });
   } else {
     await Api.post("/spotify/playSaveSongs", { trackId: id });
-    
   }
 };
 export {
