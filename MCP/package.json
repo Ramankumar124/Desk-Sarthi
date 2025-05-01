@@ -14,7 +14,8 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.10.2",
-    "axios": "^1.9.0"
+    "axios": "^1.9.0",
+    "zod": "^3.24.3"
   },
   "devDependencies": {
     "typescript": "^5.8.3"
