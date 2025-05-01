@@ -5,29 +5,16 @@ import { TfiReload } from "react-icons/tfi";
 const WeatherIndoor = () => {
   const [temp, settemp] = useState(0);
   const [hum, sethum] = useState(0);
-  const { socket } = useSocket();
 
   const handleReloadIndoorClimate =async () => {
-  await  Api.get("/weather/IndoorClimate");
+ const response= await  Api.get("/weather/IndoorClimate");
+  settemp(response?.data?.data.temp);
+  sethum(response?.data?.data.temp);
   };
 
   useEffect(() => {
     handleReloadIndoorClimate();
   }, []);
-
-  useEffect(() => {
-    if (socket) {
-      socket.on("heatIndex", (data) => {
-        try {
-          const parsedData = JSON.parse(data.data);
-          settemp(parsedData?.temp);
-          sethum(parsedData?.hum);
-        } catch (error) {
-          console.error("Error parsing JSON:", error);
-        }
-      });
-    }
-  }, [socket]);
 
   const maxTemperature = 50;
   const maxHumidity = 100;

@@ -16,6 +16,7 @@ import {
   SidebarProvider,
 } from "@/components/ui/sidebar";
 import { SidebarNavigation } from "./components/Sidebar/Sidebar";
+import { HoverBorderGradient } from "./components/ui/hover-border-gradient";
 
 
 function App() {
