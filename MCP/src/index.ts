@@ -21,7 +21,15 @@ const ToggleSwitch = async (switchId: number, state: boolean) => {
     "http://localhost:3000/api/v1/device/relayToggle",
     { switchId, state }
   );
+  return response?.data?.data;
 };
+
+const getIndoorWeather=async ()=>{
+  const  response = await axios.get(
+    "http://localhost:3000/api/v1/weather/IndoorClimate",
+  );
+  return response?.data;
+}
 
 server.tool(
   "get-outdoor-weather",
@@ -52,6 +60,16 @@ server.tool(
   }
 );
 
+server.tool(
+  "get-indoor-weather",
+  "Whenever user ask get indoor weather return this",
+  async () => ({
+    content: [
+      { type: "text", text: JSON.stringify(await getIndoorWeather()) },
+    ],
+  })
+
+)
 async function init() {
   const transport = new StdioServerTransport();
   await server.connect(transport);

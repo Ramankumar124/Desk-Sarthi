@@ -4,7 +4,7 @@ import { db } from "../../database";
 import { RELAY_STATE_ROW_ID } from "../../utils/diviceRelay";
 import { eq } from "drizzle-orm";
 
-let mqttClient: MqttClient = mqtt.connect("mqtt://192.168.31.94");
+export let mqttClient: MqttClient = mqtt.connect("mqtt://192.168.31.94");
 
 mqttClient.on("connect", () => {
   console.log("✅ MQTT connected (default)");
