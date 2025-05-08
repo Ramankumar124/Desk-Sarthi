@@ -4,10 +4,19 @@ import { db } from "../../database";
 import { RELAY_STATE_ROW_ID } from "../../utils/diviceRelay";
 import { eq } from "drizzle-orm";
 
-export let mqttClient: MqttClient = mqtt.connect("mqtt://192.168.31.94");
+
+const options = {
+  host: process.env.HIVEMQ_HOST,
+  port: 8883,
+  protocol: 'mqtts' as 'mqtts',
+  username: process.env.HIVEMQ_USERNAME,
+  password: process.env.HIVEMQ_PASSWORD,
+};
+
+export let mqttClient: MqttClient = mqtt.connect(options);
 
 mqttClient.on("connect", () => {
-  console.log("✅ MQTT connected (default)");
+  console.log("✅ MQTT connected To Server With Client Id",mqttClient.options.clientId);
   mqttClient.subscribe("home/sensors/TempHumid");
   mqttClient.subscribe("device/status/relay");
   mqttClient.subscribe("device/status/rgb");
@@ -42,13 +51,12 @@ export const initMQTT = (io: any) => {
       mqttClient.publish("home/sensors/relayState", JSON.stringify(state));
     } else if (topic === "home/sensors/TempHumid") {
       const parsedData = JSON.parse(data);
-      console.log(parsedData, typeof parsedData);
+      io.emit("heatIndex", { topic, data });
       await db?.insert(heatIndex).values({
         temperature: parsedData.temp,
         humidity: parsedData.hum,
       });
 
-      io.emit("heatIndex", { topic, data });
     } else if (topic === "device/status/relay") {
       io.emit("relayStatus", { topic, data });
     } else if (topic === "device/status/rgb") {

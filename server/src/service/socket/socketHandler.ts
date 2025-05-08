@@ -7,5 +7,16 @@ export const handleSocket = (socket: any, io: any) => {
       mqtt.publish("device/rgb", message);
       console.log(`🎨 Real-time RGB: ${message}`);
     });
+
+    socket.on("getTempIndex", () => {
+      const topic = "home/command/Temp";
+      const message = "get_TempHumid";
+      mqtt.publish(topic, message, { qos: 0 }, (error) => {
+        if (error) {
+         console.log("error while getting data",error);
+         
+        }
+      });
+    });
   };
   
