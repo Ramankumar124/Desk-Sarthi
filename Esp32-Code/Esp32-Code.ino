@@ -1,6 +1,7 @@
 #include <WiFi.h>
 #include <PubSubClient.h>
 #include <DHT.h>
+#include <WiFiClientSecure.h>
 #include <secrets.h>
 #include <ArduinoJson.h>
 
@@ -12,7 +13,7 @@
 #define Relay4 18
 
 DHT dht(DHTPIN, DHTTYPE);
-WiFiClient wifiClient;
+WiFiClientSecure  wifiClient;
 PubSubClient mqttClient(wifiClient);
 
 const char *HeadIndex = "home/sensors/TempHumid";
@@ -181,7 +182,7 @@ void reconnect()
   while (!mqttClient.connected())
   {
     Serial.println("Connecting to MQTT...");
-    if (mqttClient.connect("ESP32Client"))
+    if (mqttClient.connect("ESP32Client",mqtt_username, mqtt_password))
     {
       mqttClient.publish("Esp32Connected", "your Esp32 is connected");
       Serial.println("Connected to MQTT");
@@ -221,7 +222,7 @@ void setup()
     Serial.println("Connecting to WiFi...");
   }
   Serial.println("Connected to WiFi");
-
+ wifiClient.setCACert(root_ca);
   mqttClient.setServer(mqttBroker, mqttPort);
   mqttClient.setCallback(callback); // Set the callback function
 
