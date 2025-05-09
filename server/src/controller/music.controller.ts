@@ -38,9 +38,20 @@ const scopes = [
 // LOGIN: Generate auth URL
 const loginSpotify = asyncHandler(async (req: Request, res: Response) => {
   const state = generateRandomString(16);
+
+  // Make sure to create the session if it doesn't exist
   req.session.spotifyState = state;
-  const authUrl = spotifyApi.createAuthorizeURL(scopes, state);
-  res.json({ authUrl });
+
+  // Force session save before redirecting
+  req.session.save((err) => {
+    if (err) {
+      console.error("Session save error:", err);
+      return res.status(500).json({ error: "Session error" });
+    }
+
+    const authUrl = spotifyApi.createAuthorizeURL(scopes, state);
+    res.json({ authUrl });
+  });
 });
 
 // CALLBACK: Spotify redirects here after login

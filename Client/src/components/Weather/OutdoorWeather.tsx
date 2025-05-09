@@ -3,8 +3,20 @@ import { GrLocation } from "react-icons/gr";
 import { MdCloudQueue } from "react-icons/md";
 import Api from "@/api";
 
+interface WeatherData {
+  name: string;
+  main: {
+    temp: number;
+    humidity: number;
+    pressure: number;
+  };
+  wind: {
+    speed: number;
+  };
+  visibility: number;
+}
 const WeatherOutDoorInfo = () => {
-  const [weather, setweather] = useState(null);
+  const [weather, setweather] = useState<WeatherData | null>(null);
 
   useEffect(() => {
     const getWeatherData = async () => {
@@ -28,7 +40,7 @@ const WeatherOutDoorInfo = () => {
           <h3 className="text-background text-sm mb-1">Weather Info</h3>
           <div className="flex items-center space-x-2">
             <GrLocation className=" text-3xl font-bold " />
-            <span className="text-white">{weather?.name}, Bangladesh</span>
+            <span className="text-white">{weather?.name}, India</span>
           </div>
         </div>
         <div className="bg-blue-600/10 p-2 text-blue-600 rounded-lg text-2xl">
@@ -39,7 +51,7 @@ const WeatherOutDoorInfo = () => {
       <div className="flex items-center justify-between" id="el-8fukabrm">
         <div id="el-l7ujnop2">
           <h1 className="text-4xl font-bold text-white mb-1" id="el-usenoeet">
-            {Math.floor(weather?.main?.temp)}°C
+            {Math.floor(weather?.main?.temp!)}°C
           </h1>
           <p className="text-blue-400" id="el-2we326uc">
             Heavy Rain
@@ -68,7 +80,7 @@ const WeatherOutDoorInfo = () => {
               Wind
             </p>
             <p className="text-white" id="el-rqnwt1h8">
-              {(weather?.wind?.speed * 3.6).toFixed(2)} km/h
+              {(weather?.wind?.speed!* 3.6).toFixed(2)} km/h
             </p>
           </div>
           <div className="text-center" id="el-afla1o7v">
@@ -84,7 +96,7 @@ const WeatherOutDoorInfo = () => {
               Visibility
             </p>
             <p className="text-white" id="el-2kxt5rl6">
-              {weather?.visibility / 1000} km
+              {weather?.visibility! / 1000} km
             </p>
           </div>
         </div>

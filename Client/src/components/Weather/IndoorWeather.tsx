@@ -1,5 +1,4 @@
 import Api from "@/api";
-import { useSocket } from "@/context/socket";
 import { useEffect, useState } from "react";
 import { TfiReload } from "react-icons/tfi";
 const WeatherIndoor = () => {

@@ -35,13 +35,14 @@ app.use(
 // Configure express-session (add this before your routes)
 app.use(
   session({
-    secret: process.env.SESSION_SECRET as string ,
+    secret: process.env.SESSION_SECRET as string,
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: false, // Only save sessions when you store data
     cookie: {
-      secure: false, // Set to true in production
-      httpOnly: false,
-      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      secure: false, // Since you're using HTTP
+      httpOnly: true, // Protect cookies from client-side JS
+      maxAge: 15 * 60 * 1000, // 15 minutes is enough for auth flow
+      sameSite: "lax", // Use 'lax' for HTTP (can't use 'none' without secure:true)
     },
   })
 );
