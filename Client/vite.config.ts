@@ -12,7 +12,7 @@ export default defineConfig({
       registerType: 'autoUpdate',
       manifest: {
         name: 'Desk Sarthi',
-        short_name: 'ReactVite',
+        short_name: 'Desk Sarthi',
         start_url: '/',
         display: 'standalone',
         background_color: '#ffffff',

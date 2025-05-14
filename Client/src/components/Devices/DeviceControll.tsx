@@ -2,9 +2,10 @@ import Api from "@/api";
 import { Switch } from "@/components/ui/switch";
 import { useSocket } from "@/context/socket";
 import { useEffect, useState } from "react";
-
+import { FaFan } from "react-icons/fa";
 import { TbBulb } from "react-icons/tb";
-
+import { ImPowerCord } from "react-icons/im";
+import { GiDeskLamp } from "react-icons/gi";
 const DeviceControll = () => {
   const [isOn1, setIsOn1] = useState(false);
   const [isOn2, setIsOn2] = useState(false);
@@ -91,10 +92,10 @@ console.log(device);
         <div id="button1" className="w-fit bg-blue-500/10 p-3 rounded-xl">
           <div className="flex  items-center gap-2">
             <div className="p-3 bg-blue-500/10  rounded-lg">
-              <TbBulb className="text-blue-400 text-3xl" />
+              <FaFan className="text-blue-400 text-3xl" />
             </div>
             <div>
-              <p className="font-semibold">Smart Light</p>
+              <p className="font-semibold">Smart Fan</p>
             </div>
           </div>
           <div className="flex justify-between items-center text-xl mt-3">
@@ -110,10 +111,10 @@ console.log(device);
         <div id="button1" className="w-fit bg-blue-500/10 p-3 rounded-xl">
           <div className="flex  items-center gap-2">
             <div className="p-3 bg-blue-500/10  rounded-lg">
-              <TbBulb className="text-blue-400 text-3xl" />
+              <ImPowerCord className="text-blue-400 text-3xl" />
             </div>
             <div>
-              <p className="font-semibold">Smart Light</p>
+              <p className="font-semibold">Smart Charger</p>
             </div>
           </div>
           <div className="flex justify-between items-center text-xl mt-3">
@@ -129,10 +130,10 @@ console.log(device);
         <div id="button1" className="w-fit bg-blue-500/10 p-3 rounded-xl">
           <div className="flex  items-center gap-2">
             <div className="p-3 bg-blue-500/10  rounded-lg">
-              <TbBulb className="text-blue-400 text-3xl" />
+              <GiDeskLamp className="text-blue-400 text-3xl" />
             </div>
             <div>
-              <p className="font-semibold">Smart Light</p>
+              <p className="font-semibold">Smart Lamp</p>
             </div>
           </div>
           <div className="flex justify-between items-center text-xl mt-3">
