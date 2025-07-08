@@ -1,15 +1,25 @@
 import Api from "@/api";
+import { useSocket } from "@/context/socket";
 import { useEffect, useState } from "react";
 import { TfiReload } from "react-icons/tfi";
 const WeatherIndoor = () => {
   const [temp, settemp] = useState(0);
   const [hum, sethum] = useState(0);
+  const { socket } = useSocket();
 
-  const handleReloadIndoorClimate =async () => {
- const response= await  Api.get("/weather/IndoorClimate");
-  settemp(response?.data?.data.temp);
-  sethum(response?.data?.data.temp);
+  const handleReloadIndoorClimate = async () => {
+    const response = await Api.get("/weather/IndoorClimate");
+    settemp(response?.data?.data.temp);
+    sethum(response?.data?.data.temp);
   };
+
+  useEffect(() => {
+    if (socket) {
+      socket?.on("heatIndex", (data) => {
+        console.log(data);
+      });
+    }
+  }, [socket]);
 
   useEffect(() => {
     handleReloadIndoorClimate();

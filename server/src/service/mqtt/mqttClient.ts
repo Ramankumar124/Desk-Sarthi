@@ -35,21 +35,22 @@ export const initMQTT = (io: any) => {
     if (topic == "Esp32Connected") {
       console.log("ESp32 Connected TO server");
 
-      const states = await db
+      const data = await db
         ?.select()
         .from(relaySwitches)
         .where(eq(relaySwitches.id, RELAY_STATE_ROW_ID));
-      const state = states?.[0];
+      const states = data?.[0];
 
-      if (state) {
-        const { id, ...relayOnly } = state;
-        mqttClient.publish(
-          "home/sensors/relayState",
-          JSON.stringify(relayOnly)
-        );
-      }
-      mqttClient.publish("home/sensors/relayState", JSON.stringify(state));
-    } else if (topic === "home/sensors/TempHumid") {
+      // if (state) {
+      //   const { id, ...relayOnly } = state;
+      //   mqttClient.publish(
+      //     "home/sensors/relayState",
+      //     JSON.stringify(relayOnly)
+      //   );
+      // }
+      // setting  devices status
+      mqttClient.publish("sensor/set/relayState", JSON.stringify(states));
+    } else if (topic === "home/sensor/TempHumid") {// recieve tempHum data every minute and send to client
       const parsedData = JSON.parse(data);
       io.emit("heatIndex", { topic, data });
       await db?.insert(heatIndex).values({

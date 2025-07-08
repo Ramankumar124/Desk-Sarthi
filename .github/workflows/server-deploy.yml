@@ -1,0 +1,45 @@
+name: Desk Sarthi Server Production
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'server/**'
+
+jobs:
+  build:
+    name: Build and Deploy TS Backend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 23.11.0
+
+      - name: Install dependencies
+        run: |
+          cd server
+          npm ci
+
+      - name: Build TypeScript code
+        run: |
+          cd server
+          npm run build
+
+      - name: Upload server code to EC2
+        run: |
+          echo "${{ secrets.EC2_SSH_KEY }}" > private_key.pem
+          chmod 600 private_key.pem
+
+          rsync -avz -e "ssh -i private_key.pem -o StrictHostKeyChecking=no" ./server/dist/ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:${{ secrets.EC2_PATH }}
+
+      - name: Restart server on EC2
+        run: |
+          ssh -i private_key.pem -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+            cd ${{ secrets.EC2_PATH }}
+            pm2 restart all || pm2 start index.js --name my-app
+          EOF

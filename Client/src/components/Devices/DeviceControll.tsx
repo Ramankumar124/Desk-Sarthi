@@ -17,7 +17,6 @@ const DeviceControll = () => {
     async function getRelaysState() {
       const response = await Api.get("/device/getRelayState");
       const device = response.data.data;
-console.log(device);
 
       if (device.relay1 == "ON") setIsOn1(true);
       else setIsOn1(false);
@@ -33,6 +32,8 @@ console.log(device);
 
   useEffect(() => {
     socket?.on("relayStatus", (data) => {
+      console.log("this event is triggered");
+      
       const device = JSON.parse(data?.data);
 
       if (device.id == "Relay1") {

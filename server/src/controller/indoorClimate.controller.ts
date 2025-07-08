@@ -10,8 +10,9 @@ import { sql } from "drizzle-orm";
 const IndoorClimate = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const mqtt = getMQTTClient();
-    const topic = "home/command/Temp";
+    const topic = "sensor/get/TempHum";
     const message = "get_TempHumid";
+    // send get temphum command to device
     mqtt.publish(topic, message, { qos: 0 }, (error) => {
       if (error) {
         return next(new ApiError(400, "Unable to get Indor Weather Data"));
@@ -24,7 +25,8 @@ const IndoorClimate = asyncHandler(
       const messageHandler = async (topic: string, message: Buffer) => {
         const data = message.toString();
         console.log(`📥 MQTT: ${topic} - ${data}`);
-        if (topic === "home/sensors/TempHumid") {
+        // reciver tempHum data from device
+        if (topic === "home/sensor/TempHumid") {
           TempIndex = JSON.parse(data);
           mqttClient.removeListener("message", messageHandler);
 
@@ -50,15 +52,6 @@ const IndoorClimate = asyncHandler(
 );
 const getIndoorAnalytics = asyncHandler(async (req, res, next) => {
   const { duration } = req.body;
-  console.log("req body", req.body);
-  // Examples for duration parameter:
-  // '1 hour'    - Data from the last hour
-  // '24 hours'  - Data from the last 24 hours
-  // '7 days'    - Data from the last week
-  // '1 month'   - Data from the last month
-  // '1 year'    - Data from the last year
-  // '30 minutes' - Data from the last 30 minutes
-
   const data = await db
     ?.select()
     .from(heatIndex)

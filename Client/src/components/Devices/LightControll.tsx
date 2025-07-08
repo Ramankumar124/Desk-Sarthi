@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Wheel from "@uiw/react-color-wheel";
 import { hsvaToRgba, rgbaToHsva } from "@uiw/color-convert";
+import { useSocket } from "@/context/socket";
+import { useDebounce } from 'use-debounce';
 interface RGBA {
   r: number;
   g: number;
@@ -9,12 +11,24 @@ interface RGBA {
 }
 const LightControll = () => {
   const [rgba, setRgba] = useState<RGBA>({ r: 255, g: 128, b: 6, a: 1 });
+  const [debouncedRgba]=useDebounce(rgba,500);
+  const {socket}=useSocket();
+
 
   const handleWheelChange = (color: { hsva: { h: number; s: number; v: number; a: number } }) => {
     const newRgba = hsvaToRgba(color.hsva);
     setRgba(newRgba);
-    console.log(color);
   };
+
+  useEffect(() => {
+  if(socket){
+    console.log(debouncedRgba);
+    
+    socket.emit("rgbChange",{rgba:debouncedRgba});
+  }
+    
+  }, [debouncedRgba])
+  
   // const handleSliderChange = (key: keyof RGBA, value: number) => {
   //   setRgba((prev) => ({ ...prev, [key]: value }));
   // };
