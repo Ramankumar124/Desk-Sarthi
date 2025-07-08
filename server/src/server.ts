@@ -7,7 +7,7 @@ import { handleSocket } from "./service/socket/socketHandler";
 
 DBConnection();
   const server = http.createServer(app);
-  const ALLOWED_ORIGINS:any = [process.env.CLIENT_URL, "http://localhost:5173"];
+  const ALLOWED_ORIGINS:any = [process.env.CLIENT_URL,"http://localhost:5173"];
 
   const io = new Server(server, {
     cors: {
@@ -16,6 +16,8 @@ DBConnection();
     },
   });
 
+
+  
   try {
     io.on("connection", (socket) => {
       handleSocket(socket, io);
