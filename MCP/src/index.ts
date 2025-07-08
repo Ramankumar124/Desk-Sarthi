@@ -2,7 +2,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import axios from "axios";
 import { z } from "zod";
-// import { getOutDoorWeather } from "./Tools.js";
+// import { getOutDoorWeather } from "./Tools.js";//custom file foor tools
 
 const server = new McpServer({
   name: "Desk-Sarthi-mcp",
