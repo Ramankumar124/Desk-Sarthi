@@ -27,5 +27,5 @@ DBConnection();
   }
   
 server.listen(process.env.PORT, () => {
-  console.info(`Your server is running on Port no ${process.env.PORT}`);
+  console.info(`Your server is running on Port no ${process.env.PORT} please access it`);
 });
