@@ -41,7 +41,7 @@ app.use(
     cookie: {
       secure: false, // Since you're using HTTP
       httpOnly: true, // Protect cookies from client-side JS
-      maxAge: 15 * 60 * 1000, // 15 minutes is enough for auth flow
+      maxAge: 15 * 60 * 1000,
       sameSite: "lax", // Use 'lax' for HTTP (can't use 'none' without secure:true)
     },
   })
