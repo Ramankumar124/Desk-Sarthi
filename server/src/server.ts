@@ -15,9 +15,6 @@ DBConnection();
       methods: ["GET", "POST"],
     },
   });
-
-
-  
   try {
     io.on("connection", (socket) => {
       handleSocket(socket, io);
@@ -30,5 +27,5 @@ DBConnection();
   }
   
 server.listen(process.env.PORT, () => {
-  console.info(`your server is running on Port no ${process.env.PORT}`);
+  console.info(`Your server is running on Port no ${process.env.PORT}`);
 });
