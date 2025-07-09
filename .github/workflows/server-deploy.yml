@@ -22,10 +22,12 @@ jobs:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
-        node-version: ${{ matrix.node-version }} 
+        with:
+          node-version: ${{ matrix.node-version }}
+
 
       - name: Cache npm
-        uses: actions/cache@v3
+        uses: actions/cache@v3upa
         with:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('server/**/package-lock.json') }}
@@ -33,7 +35,7 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run build
-      
+
       - uses: actions/upload-artifact@v4
         with:
           name: server-dist
