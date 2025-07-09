@@ -27,7 +27,8 @@ jobs:
 
 
       - name: Cache npm
-        uses: actions/cache@v3upa
+        uses: actions/cache@v4
+
         with:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('server/**/package-lock.json') }}
