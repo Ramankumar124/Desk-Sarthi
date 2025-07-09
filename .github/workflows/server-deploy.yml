@@ -64,13 +64,18 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            # Load nvm to provide npm & pm2 on remote :contentReference[oaicite:3]{index=3}
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
             cd ${{ secrets.EC2_PATH }}
-            rm -rf dist && mkdir -p dist
-            rsync -avz --delete dist/ .
+
+            # Confirm correct files
+            ls package.json ecosystem.config.js
+
+            # Replace dist only
+            rm -rf dist && mkdir dist
+            rsync -avz --delete dist/ ./dist/
 
             npm install --omit=dev
             pm2 reload ecosystem.config.js || pm2 start ecosystem.config.js
+            pm2 save
