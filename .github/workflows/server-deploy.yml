@@ -20,6 +20,7 @@ jobs:
         with:
           node-version: '24.x'
           cache: 'npm'
+          cache-dependency-path: server/package-lock.json  # <-- specify path here
 
       - name: Install dependencies
         run: npm ci
