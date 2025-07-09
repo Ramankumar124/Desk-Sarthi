@@ -1,51 +1,58 @@
-name: Desk Sarthi Server Production
+# .github/workflows/deploy-server.yml
+name: CI/CD server
 
 on:
   push:
     branches: [main]
     paths:
-      - "server/**"
+      - 'server/**'       # trigger only when server code changes
+      - '.github/**'       # or when workflow itself changes
+
+defaults:
+  run:
+    working-directory: server
 
 jobs:
   build:
-    name: Build and Deploy TS Backend
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        node: [24.x]
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
-
-      - name: Setup Node
-        uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: node-version: ${{ matrix.node }}
+      - name: Cache npm
+        uses: actions/cache@v3
         with:
-          node-version: 24.0.1
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('server/**/package-lock.json') }}
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: server-dist
+          path: dist/
 
-      - name: Install dependencies
-        run: |
-          cd server
-          npm ci
-
-      - name: Build TypeScript code
-        run: |
-          cd server
-          npm run build
-
-      - name: Upload server code to EC2
-        run: |
-          echo "${{ secrets.EC2_SSH_KEY }}" > private_key.pem
-          chmod 600 private_key.pem
-
-          rsync -avz -e "ssh -i private_key.pem -o StrictHostKeyChecking=no" ./server/dist/ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:${{ secrets.EC2_PATH }}
-
-      - name: Restart server on EC2
-        run: |
-         ssh -i private_key.pem -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
-           export NVM_DIR="$HOME/.nvm"
-           [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-
-           nvm use 24.0.1
-
-           cd ${{ secrets.EC2_PATH }}
-           pm2 restart all || pm2 start dist/server.js --name my-server
-         EOF
-
+  deploy:
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: server-dist
+          path: server/dist
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd ${{ secrets.EC2_PATH }}
+            rm -rf dist && mkdir -p dist
+            rsync -avz --delete server/dist/ .
+            npm install --omit=dev
+            pm2 reload ecosystem.config.js || pm2 start ecosystem.config.js
