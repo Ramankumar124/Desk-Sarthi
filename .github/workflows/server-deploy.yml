@@ -38,6 +38,7 @@ jobs:
           source: "server/"
           target: "/home/ubuntu/Desk-Sarthi/"
           rm: true
+          excludes: ".env"
 
       - name: Install dependencies and restart server on EC2
         uses: appleboy/ssh-action@v1.0.0
