@@ -43,7 +43,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: server-dist
-          path: server/dist/  # ensure path is relative to repo root :contentReference[oaicite:1]{index=1}
+          path: server/dist/    # must reference repo root :contentReference[oaicite:1]{index=1}
 
   deploy:
     needs: build
@@ -55,7 +55,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: server-dist
-          path: server/dist  # same root-relative path :contentReference[oaicite:2]{index=2}
+          path: server/dist     # same root-relative path :contentReference[oaicite:2]{index=2}
 
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.0.0
@@ -64,8 +64,13 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
+            # Load nvm to provide npm & pm2 on remote :contentReference[oaicite:3]{index=3}
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
             cd ${{ secrets.EC2_PATH }}
             rm -rf dist && mkdir -p dist
-            rsync -avz --delete server/dist/ .
+            rsync -avz --delete dist/ .
+
             npm install --omit=dev
             pm2 reload ecosystem.config.js || pm2 start ecosystem.config.js
